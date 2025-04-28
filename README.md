@@ -6,7 +6,7 @@ any LINUX terminal that has the following packages installed
 * docker
   
 **Steps**
-* Clone this repo
+* clone this repo
 * cd into it
 * run `chmod +x aws-script.sh`
 * run `./aws_script.sh`
