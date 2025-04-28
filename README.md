@@ -4,6 +4,7 @@
 any LINUX terminal that has the following packages installed
 * awscli
 * docker
+  
 **Steps**
 * Clone this repo
 * cd into it
