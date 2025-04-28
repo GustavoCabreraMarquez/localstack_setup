@@ -1,11 +1,17 @@
 #!/bin/bash
 #author: Gustavo Marquez
-docker run -d  --rm -it --name aws  -p 127.0.0.1:4566:4566   -p 127.0.0.1:4510-4559:4510-4559   -v /var/run/docker.sock:/var/run/docker.sock   localstack/localstack
+if [[ $(docker -v) ]]; then
+        echo "docker CLI detected, proceeding..."
+	docker run -d  --rm -it --name aws  -p 127.0.0.1:4566:4566   -p 127.0.0.1:4510-4559:4510-4559   -v /var/run/docker.sock:/var/run/docker.sock   localstack/localstack
+else
+	echo 'No docker CLI detected'
+	echo 'install it and run the script again'
+	exit 1
+fi
 if [[ -e $HOME/.aws/credentials ]]; then
 	echo credentials file already exist
 	echo "turning credentials into credentils_copy"
 	mv $HOME/.aws/credentials $HOME/.aws/credentials_copy
-	echo "now creating your temp credentials file" 
 	cat <<EOF > $HOME/.aws/credentials
 		[default]
 		aws_access_key_id=test
@@ -19,7 +25,6 @@ EOF
 else
 	echo "you have no aws credentials file"
 	echo "creating one"
-	echo "tmp credentials file created succesfully"
 		cat <<EOF > $HOME/.aws/credentials
 		[default]
 		aws_access_key_id=test
@@ -32,10 +37,7 @@ EOF
 fi
 
 if [[ -e $HOME/.aws/config ]]; then
-	echo config file already exists
-	echo "turning config into config_copy"
 	mv $HOME/.aws/config $HOME/.aws/config_copy
-	echo "now creating your temp config file" 
 	cat <<EOF > $HOME/.aws/config
 	[profile localstack]
 	region=us-east-1
@@ -47,9 +49,6 @@ if [[ -e $HOME/.aws/config ]]; then
 	endpoint_url = http://localhost:4566
 EOF
 else
-	echo "you have no aws config file"
-	echo "creating one"
-	echo "tmp config file created succesfully"
 	cat <<EOF > $HOME/.aws/config
 	[profile localstack]
 	region=us-east-1
@@ -72,13 +71,13 @@ echo ' '
 echo ' '
 sleep 2
 
-echo "creating 3 buckets to test the local endpoint"
+echo "creating 4 buckets to test the local endpoint"
 
 buckets=("chimera" "genesis" "ego-death" "reverie")
 sleep 3
 for bucket in "${buckets[@]}";do
 	aws s3api create-bucket --bucket $bucket > /dev/null
-	echo "succesfully create $bucket"
+	echo "succesfully created bucket named: $bucket"
 done
 echo "will output your current credentials..."
 aws sts get-caller-identity
